@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="UTF-8">
+<title>Generar transaccion de Metamask a otra cuenta</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="">
+<style>
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.6.1/web3.min.js"></script>
+<body>
+
+<div class="">
+ <h1>Almacenar valor</h1>
+ <p>Valor a alamcenar:</p>
+ <input id="txtValue" value="" style="width:400px" />
+
+ <input type="button" value="Enviar" onClick="enviarTransaccion()" />
+</div>
+
+<script>
+
+    const {ethereum} = window;
+    const resultado = Boolean(ethereum && ethereum.isMetaMask);
+
+    async function enviarTransaccion() {
+
+        const valorParaAlmacenar = document.getElementById("txtValue").value;
+
+        let web3provider = window.ethereum;
+        try {
+            await web3provider.request({ method: "eth_requestAccounts"});
+        }
+        catch (Error) {
+            alert(Error);
+        }
+
+        const web3 = new Web3(web3provider);
+
+        const accounts = await web3.eth.getAccounts();
+        const cuenta = accounts[0];
+
+        // DIRECCION DEL CONTRATO: 0x4D7a9bd3f370459bca834BCee055CaC0f3fFb460
+        // ABI: ABAJO
+
+        let abi = [
+            {
+            "inputs": [
+                {
+                "internalType": "uint256",
+                "name": "num",
+                "type": "uint256"
+                }
+            ],
+            "name": "store",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+            },
+            {
+            "inputs": [],
+            "name": "retrieve",
+            "outputs": [
+                {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function",
+            "constant": true
+            }
+        ];
+
+        let contrato = await new web3.eth.Contract(abi, "0x4D7a9bd3f370459bca834BCee055CaC0f3fFb460");
+
+        await contrato.methods.store(valorParaAlmacenar).send({from: cuenta});
+
+        alert(await contrato.methods.retrieve().call());
+    }
