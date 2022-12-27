@@ -21,7 +21,46 @@ pragma solidity >=0.7.0 <0.9.0;
     address public nft;
     constructor() ERC20("Loteria", "JA"){
         _mint(address(this), 1000);
+        nft= address(new mainERC721());
     }
+
+    //Ganador del premio de Loteria
+    address public ganador;
+
+    // Registro de usuario con su contrato
+    mapping(address => address) public usuario_contract;
+
+    //Precio de los Tokens
+    function precioTokens(uint256 _numTokens) public pure returns (uint256){
+        return _numTokens * (1 ether);
+    }
+
+    //Visualizacion de balance de tokens  ERC20 de un usuario
+    function balanceTokens(address _account) public view returns (uint256){
+        return balanceOf(_account);
+    }
+
+    //Visualizacion de balance de tokens  ERC20 de Smart Contract
+    function balanceTokensSC() public view returns (uint256){
+        return balanceOf(address(this));
+    }
+
+    //Balance de ether del smart contract
+    function balanceetherSC() public view returns (uint256) {
+        return address(this).balance / 10**18;
+    }
+
+    //Cargar tokens a el Contrato 
+    function mint(uint256, _cant) public onlyOwner {
+        _mint(address(this), _cant);
+    }
+
+
+
+
+
+
+
 
  }
 
